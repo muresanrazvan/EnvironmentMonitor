@@ -47,6 +47,21 @@ while True:
         print ("lux",lux[0])
         data["light"]=lux[0]
         file.write(lux[0]+'\n')
+    if "dB" in output:
+        dBs=re.findall("\d+\.\d+", output)
+        print ("dBs",dBs[0])
+        data["noise"]=dBs[0]
+        file.write(dBs[0]+'\n')
+    if "ppb" in output:
+        tvoc=re.findall("\d+\.\d+", output)
+        print ("ppb",tvoc[0])
+        data["TVOC"]=tvoc[0]
+        file.write(tvoc[0]+'\n')
+    if "ppm" in output:
+        eco2=re.findall("\d+\.\d+", output)
+        print ("ppm",eco2[0])
+        data["eCO2"]=eco2[0]
+        file.write(eco2[0]+'\n')
         data["timestamp"]=int(round(time.time() * 1000))
         db.child("users").child(str(datetime.datetime.now()).replace(":","-").replace(" ","-").replace(".","-")).set(data)
         continue
