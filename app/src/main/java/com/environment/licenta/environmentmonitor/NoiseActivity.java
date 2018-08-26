@@ -15,11 +15,7 @@ import com.jjoe64.graphview.series.LineGraphSeries;
 import java.util.ArrayList;
 import java.util.Date;
 
-public class LightActivity extends Activity {
-
-    private String averageLight;
-    private String lowestLight;
-    private String highestLight;
+public class NoiseActivity extends Activity {
 
     public DataPoint[] getDatapoints(){
         ArrayList<EnvironmentData> env_data=ProgramData.getInstance().environmentDataList;
@@ -29,54 +25,61 @@ public class LightActivity extends Activity {
         for(EnvironmentData data:env_data) {
             Date date = new Date();
             date.setTime(data.getTimestamp());
-            datapoints[index++] = new DataPoint(date, Double.parseDouble(data.getLight()));
+            datapoints[index++] = new DataPoint(date, Double.parseDouble(data.getNoise()));
         }
 
         return datapoints;
     }
 
-    public void computeLowHighAvg(){
+    public String lowestNoiseValue() {
         ArrayList<EnvironmentData> env_data=ProgramData.getInstance().environmentDataList;
-
-        double totalLight=0;
-        double lowestLight=Double.MAX_VALUE;
-        double highestLight=0;
-
+        double lowest=Double.MAX_VALUE;
         for(EnvironmentData data:env_data) {
-            double light=Double.parseDouble(data.getLight());
-
-            totalLight+=light;
-
-            if(lowestLight>light){
-                lowestLight=light;
-            }
-
-            if(highestLight<light){
-                highestLight=light;
+            double noise=Double.parseDouble(data.getNoise());
+            if(lowest>noise){
+                lowest=noise;
             }
         }
-        this.averageLight= "" + String.format("%.2f", totalLight / env_data.size());
-        this.lowestLight= "" + lowestLight;
-        this.highestLight= "" + highestLight;
+        return ""+lowest;
+    }
+
+    public String highestNoiseValue() {
+        ArrayList<EnvironmentData> env_data=ProgramData.getInstance().environmentDataList;
+        double highest=0;
+        for(EnvironmentData data:env_data) {
+            double noise=Double.parseDouble(data.getNoise());
+            if(highest<noise){
+                highest=noise;
+            }
+        }
+        return ""+highest;
+    }
+
+    public String averageNoiseValue() {
+        ArrayList<EnvironmentData> env_data=ProgramData.getInstance().environmentDataList;
+        double total=0;
+        for(EnvironmentData data:env_data) {
+            double noise=Double.parseDouble(data.getNoise());
+                total+=noise;
+        }
+        return "" + String.format("%.2f", total / env_data.size());
     }
 
     @Override
     public void onCreate(Bundle savedInstance) {
         super.onCreate(savedInstance);
-        setContentView(R.layout.light);
+        setContentView(R.layout.noise);
         ArrayList<EnvironmentData> data=ProgramData.getInstance().environmentDataList;
-        computeLowHighAvg();
-
-        GraphView graph = findViewById(R.id.lightGraphId);
-        TextView currentLight = findViewById(R.id.currentLightId);
-        TextView lowestLight = findViewById(R.id.lowestLightId);
-        TextView averageLight = findViewById(R.id.averageLightId);
-        TextView highestLight = findViewById(R.id.highestLightId);
+        GraphView graph = findViewById(R.id.noiseGraphId);
+        TextView currentNoise = findViewById(R.id.currentNoiseId);
+        TextView highestNoise = findViewById(R.id.highestNoiseId);
+        TextView lowestNoise = findViewById(R.id.lowestNoiseId);
+        TextView averageNoise = findViewById(R.id.averageNoiseId);
 
         DataPoint datapoints[] = getDatapoints();
         LineGraphSeries<DataPoint> series = new LineGraphSeries<>(datapoints);
 
-        series.setColor(Color.YELLOW);
+        series.setColor(Color.BLACK);
         series.setThickness(3);
 
         graph.addSeries(series);
@@ -86,9 +89,9 @@ public class LightActivity extends Activity {
         graph.getViewport().setMaxX(datapoints[datapoints.length-1].getX());
         graph.getGridLabelRenderer().setHumanRounding(false);
 
-        currentLight.setText(data.get(data.size()-1).getLight()+"Lux");
-        highestLight.setText("Highest Light Value: "+this.highestLight+"Lux");
-        lowestLight.setText("Lowest Light Value: "+this.lowestLight+"Lux");
-        averageLight.setText("Average Light Value: "+this.averageLight+"Lux");
+        currentNoise.setText(data.get(data.size()-1).getNoise()+"dB");
+        highestNoise.setText("Highest Value Recorded: "+highestNoiseValue()+"dB");
+        lowestNoise.setText("Lowest Value Recorded: "+lowestNoiseValue()+"dB");
+        averageNoise.setText("Total Average Value: "+averageNoiseValue()+"dB");
     }
 }

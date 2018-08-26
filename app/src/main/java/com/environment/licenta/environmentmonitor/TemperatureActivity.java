@@ -5,6 +5,7 @@ import android.graphics.Color;
 import android.graphics.DashPathEffect;
 import android.graphics.Paint;
 import android.os.Bundle;
+import android.widget.TextView;
 
 import com.environment.licenta.environmentmonitor.model.ProgramData;
 import com.environment.licenta.environmentmonitor.utils.HourAsXAxisLabelFormatter;
@@ -40,7 +41,10 @@ public class TemperatureActivity extends Activity {
     public void onCreate(Bundle savedInstance) {
         super.onCreate(savedInstance);
         setContentView(R.layout.temperature);
+        ArrayList<EnvironmentData> data=ProgramData.getInstance().environmentDataList;
         GraphView graph = findViewById(R.id.graph);
+        TextView currentTemp = findViewById(R.id.currentTemperatureId);
+        currentTemp.setText(data.get(data.size()-1).getTemperature()+"\u00b0C");
         DataPoint datapoints[] = getDatapoints();
         LineGraphSeries<DataPoint> series = new LineGraphSeries<>(datapoints);
 

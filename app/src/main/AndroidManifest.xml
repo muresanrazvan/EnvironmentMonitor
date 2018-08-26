@@ -22,6 +22,7 @@
         </activity>
 
         <activity android:name=".EditNotificationsActivity"
+            android:label="Settings"
             android:parentActivityName=".MainActivity">
             <!-- The meta-data tag is required if you support API level 15 and lower -->
             <meta-data
@@ -30,6 +31,7 @@
         </activity>
 
         <activity android:name=".TemperatureActivity"
+            android:label="Temperature"
             android:parentActivityName=".MainActivity">
             <!-- The meta-data tag is required if you support API level 15 and lower -->
             <meta-data
@@ -38,6 +40,7 @@
         </activity>
 
         <activity android:name=".HumidityActivity"
+            android:label="Humidity"
             android:parentActivityName=".MainActivity">
             <!-- The meta-data tag is required if you support API level 15 and lower -->
             <meta-data
@@ -46,6 +49,25 @@
         </activity>
 
         <activity android:name=".LightActivity"
+            android:label="Light"
+            android:parentActivityName=".MainActivity">
+            <!-- The meta-data tag is required if you support API level 15 and lower -->
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".MainActivity" />
+        </activity>
+
+        <activity android:name=".AirQualityActivity"
+            android:label="Air Quality"
+            android:parentActivityName=".MainActivity">
+            <!-- The meta-data tag is required if you support API level 15 and lower -->
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".MainActivity" />
+        </activity>
+
+        <activity android:name=".NoiseActivity"
+            android:label="Noise"
             android:parentActivityName=".MainActivity">
             <!-- The meta-data tag is required if you support API level 15 and lower -->
             <meta-data
