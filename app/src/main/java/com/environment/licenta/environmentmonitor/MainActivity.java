@@ -1,11 +1,14 @@
 package com.environment.licenta.environmentmonitor;
 
 import android.app.Activity;
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 
+import com.environment.licenta.environmentmonitor.model.ProgramData;
 import com.environment.licenta.environmentmonitor.utils.EnvironmentValueEventListener;
+import com.environment.licenta.environmentmonitor.utils.NotificationService;
 import com.environment.licenta.environmentmonitor.utils.StartActivityOnClickListener;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
@@ -30,7 +33,10 @@ public class MainActivity extends Activity {
         FirebaseDatabase database = FirebaseDatabase.getInstance();
         DatabaseReference myRef = database.getReference("users");
         myRef.addValueEventListener(new EnvironmentValueEventListener(this));
+
         setContentView(R.layout.activity_main);
+
+        startService(new Intent(this, NotificationService.class));
 
         Button exitButton=findViewById(R.id.exitButtonId);
         exitButton.setOnClickListener(new ExitEventListener(this));
