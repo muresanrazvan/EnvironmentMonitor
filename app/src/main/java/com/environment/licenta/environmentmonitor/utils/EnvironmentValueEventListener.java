@@ -3,7 +3,6 @@ package com.environment.licenta.environmentmonitor.utils;
 import android.app.Activity;
 import android.view.View;
 import android.widget.Button;
-import android.widget.EditText;
 import android.widget.TextView;
 
 import com.environment.licenta.environmentmonitor.R;
@@ -46,13 +45,17 @@ public class EnvironmentValueEventListener implements ValueEventListener {
         mainHumidity.setText("Humidity: "+modelInstance.get(modelInstance.size()-1).getHumidity()+"%");
         mainHumidity.setVisibility(View.VISIBLE);
 
+        Button noiseButton=activity.findViewById(R.id.noiseButtonId);
+        noiseButton.setEnabled(true);
+        Button airQualityButton=activity.findViewById(R.id.airQualityButtonId);
+        airQualityButton.setEnabled(true);
         Button lightButton=activity.findViewById(R.id.lightButtonId);
         lightButton.setEnabled(true);
         Button temperatureButton=activity.findViewById(R.id.temperatureButtonId);
         temperatureButton.setEnabled(true);
         Button humidityButton=activity.findViewById(R.id.humidityButtonId);
         humidityButton.setEnabled(true);
-        Button editNotificationButton=activity.findViewById(R.id.editNotificationsId);
+        Button editNotificationButton=activity.findViewById(R.id.settingsId);
         editNotificationButton.setEnabled(true);
 
         Date d = new Date();
