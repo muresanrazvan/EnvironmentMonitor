@@ -22,7 +22,7 @@ ser = serial.Serial('/dev/ttyACM0', 9600, 8, 'N', 1, timeout=1)
 
 count=0
 while True:
-  print "----"
+  print("----")
   if count==0:
       file=open("output.txt","a")
   while output != "":
