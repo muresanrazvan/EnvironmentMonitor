@@ -1,5 +1,7 @@
 package com.environment.licenta.environmentmonitor.model;
 
+import android.content.Context;
+
 import com.environment.licenta.environmentmonitor.wrappers.EnvironmentData;
 
 import java.util.ArrayList;
@@ -20,6 +22,12 @@ public class ServiceData {
 
     public double maxCO2;
     public double minCO2;
+
+    public boolean temperatureEnabled;
+    public boolean humidityEnabled;
+    public boolean lightEnabled;
+    public boolean noiseEnabled;
+    public boolean eCO2Enabled;
 
     private static ServiceData instance;
 

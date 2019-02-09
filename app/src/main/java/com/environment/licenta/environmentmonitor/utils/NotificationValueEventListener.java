@@ -24,11 +24,34 @@ public class NotificationValueEventListener implements ValueEventListener {
     @Override
     public void onDataChange(DataSnapshot dataSnapshot) {
         putFirebaseData(dataSnapshot);
+        ServiceData serviceData=ServiceData.getInstance();
         EnvironmentData lastDatapoint = ServiceData.getInstance().environmentDataList.get(ServiceData.getInstance().environmentDataList.size()-1);
 
         NotificationManagerCompat notificationManager = NotificationManagerCompat.from(this.context);
 
-        notificationManager.notify(2, getTemperatureNotification(Double.parseDouble(lastDatapoint.getTemperature())).build());
+        // Pre build the notifications
+        NotificationCompat.Builder temperatureNotification=getTemperatureNotification(Double.parseDouble(lastDatapoint.getTemperature()));
+        NotificationCompat.Builder humidityNotification=getHumidityNotification(Double.parseDouble(lastDatapoint.getHumidity()));
+        NotificationCompat.Builder lightNotification=getLightNotification(Double.parseDouble(lastDatapoint.getLight()));
+        NotificationCompat.Builder noiseNotification=getNoiseNotification(Double.parseDouble(lastDatapoint.getNoise()));
+        NotificationCompat.Builder eCO2Notification=getCO2Notification(Double.parseDouble(lastDatapoint.getECO2()));
+
+        if(serviceData.temperatureEnabled && temperatureNotification!=null){
+            notificationManager.notify(1, temperatureNotification.build());
+        }
+        if(serviceData.humidityEnabled && humidityNotification!=null){
+            notificationManager.notify(2, humidityNotification.build());
+        }
+        if(serviceData.lightEnabled && lightNotification!=null){
+            notificationManager.notify(3, lightNotification.build());
+        }
+        if(serviceData.noiseEnabled && noiseNotification!=null){
+            notificationManager.notify(4, noiseNotification.build());
+        }
+        if(serviceData.eCO2Enabled && eCO2Notification!=null){
+            notificationManager.notify(5, eCO2Notification.build());
+        }
+
     }
 
     private NotificationCompat.Builder getTemperatureNotification(double currentTemperature){
@@ -39,13 +62,15 @@ public class NotificationValueEventListener implements ValueEventListener {
         if (currentTemperature<serviceData.minTemperature){
             mBuilder.setContentTitle("Temperature too low")
                     .setContentText("Current temperature: "+currentTemperature+"C");
+            return mBuilder;
         }
         if (currentTemperature>serviceData.maxTemperature){
             mBuilder.setContentTitle("Temperature too high")
                     .setContentText("Current temperature: "+currentTemperature+"C");
+            return mBuilder;
         }
 
-        return mBuilder;
+        return null;
     }
 
     private NotificationCompat.Builder getHumidityNotification(double currentHumidity){
@@ -56,13 +81,15 @@ public class NotificationValueEventListener implements ValueEventListener {
         if (currentHumidity<serviceData.minHumidity){
             mBuilder.setContentTitle("Humidity Too Low")
                     .setContentText("Current Humidity: "+currentHumidity+"%");
+            return mBuilder;
         }
         if (currentHumidity>serviceData.maxHumidity){
             mBuilder.setContentTitle("Humidity Too High")
                     .setContentText("Current Humidity: "+currentHumidity+"%");
+            return mBuilder;
         }
 
-        return mBuilder;
+        return null;
     }
 
     private NotificationCompat.Builder getNoiseNotification(double currentNoise){
@@ -73,13 +100,15 @@ public class NotificationValueEventListener implements ValueEventListener {
         if (currentNoise<serviceData.minNoise){
             mBuilder.setContentTitle("Noise Too Low")
                     .setContentText("Current Noise: "+currentNoise+"dB");
+            return mBuilder;
         }
         if (currentNoise>serviceData.maxNoise){
             mBuilder.setContentTitle("Noise Too High")
                     .setContentText("Current Noise: "+currentNoise+"dB");
+            return mBuilder;
         }
 
-        return mBuilder;
+        return null;
     }
 
     private NotificationCompat.Builder getLightNotification(double currentLight){
@@ -90,13 +119,15 @@ public class NotificationValueEventListener implements ValueEventListener {
         if (currentLight<serviceData.minLight){
             mBuilder.setContentTitle("Light Too Low")
                     .setContentText("Current Light: "+currentLight+"Lux");
+            return mBuilder;
         }
         if (currentLight>serviceData.maxLight){
             mBuilder.setContentTitle("Light Too High")
                     .setContentText("Current Light: "+currentLight+"Lux");
+            return mBuilder;
         }
 
-        return mBuilder;
+        return null;
     }
 
     private NotificationCompat.Builder getCO2Notification(double currentCO2){
@@ -107,13 +138,15 @@ public class NotificationValueEventListener implements ValueEventListener {
         if (currentCO2<serviceData.minCO2){
             mBuilder.setContentTitle("CO2 Too Low")
                     .setContentText("Current eCO2: "+currentCO2+"ppm");
+            return mBuilder;
         }
         if (currentCO2>serviceData.maxCO2){
             mBuilder.setContentTitle("CO2 Too High")
                     .setContentText("Current eCO2: "+currentCO2+"ppm");
+            return mBuilder;
         }
 
-        return mBuilder;
+        return null;
     }
 
     private void putFirebaseData(DataSnapshot dataSnapshot){

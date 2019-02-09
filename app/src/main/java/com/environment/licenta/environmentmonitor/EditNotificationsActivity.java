@@ -104,6 +104,8 @@ public class EditNotificationsActivity extends Activity {
                 prefs.edit().putBoolean("environment.lightAlert", lightSwitch.isChecked()).apply();
                 prefs.edit().putBoolean("environment.noiseAlert", noiseSwitch.isChecked()).apply();
                 prefs.edit().putBoolean("environment.CO2Alert",CO2Switch.isChecked()).apply();
+
+                startService(new Intent(EditNotificationsActivity.this, NotificationService.class));
             }
         });
     }
@@ -118,6 +120,7 @@ public class EditNotificationsActivity extends Activity {
         minNoiseText.setEnabled(noiseSwitch.isChecked());
         maxNoiseText.setEnabled(noiseSwitch.isChecked());
         minCO2Text.setEnabled(CO2Switch.isChecked());
+        maxCO2Text.setEnabled(CO2Switch.isChecked());
 
     }
 

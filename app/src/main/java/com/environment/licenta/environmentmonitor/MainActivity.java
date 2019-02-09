@@ -36,8 +36,6 @@ public class MainActivity extends Activity {
 
         setContentView(R.layout.activity_main);
 
-        startService(new Intent(this, NotificationService.class));
-
         Button exitButton=findViewById(R.id.exitButtonId);
         exitButton.setOnClickListener(new ExitEventListener(this));
 
