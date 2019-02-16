@@ -57,7 +57,7 @@ public class NotificationValueEventListener implements ValueEventListener {
     private NotificationCompat.Builder getTemperatureNotification(double currentTemperature){
         ServiceData serviceData=ServiceData.getInstance();
         NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(this.context, "channel_id")
-                .setSmallIcon(R.drawable.notification_icon)
+                .setSmallIcon(R.drawable.noise)
                 .setPriority(NotificationCompat.PRIORITY_DEFAULT);
         if (currentTemperature<serviceData.minTemperature){
             mBuilder.setContentTitle("Temperature too low")
@@ -76,7 +76,7 @@ public class NotificationValueEventListener implements ValueEventListener {
     private NotificationCompat.Builder getHumidityNotification(double currentHumidity){
         ServiceData serviceData=ServiceData.getInstance();
         NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(this.context, "channel_id")
-                .setSmallIcon(R.drawable.notification_icon)
+                .setSmallIcon(R.drawable.humidity)
                 .setPriority(NotificationCompat.PRIORITY_DEFAULT);
         if (currentHumidity<serviceData.minHumidity){
             mBuilder.setContentTitle("Humidity Too Low")
@@ -95,7 +95,7 @@ public class NotificationValueEventListener implements ValueEventListener {
     private NotificationCompat.Builder getNoiseNotification(double currentNoise){
         ServiceData serviceData=ServiceData.getInstance();
         NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(this.context, "channel_id")
-                .setSmallIcon(R.drawable.notification_icon)
+                .setSmallIcon(R.drawable.noise)
                 .setPriority(NotificationCompat.PRIORITY_DEFAULT);
         if (currentNoise<serviceData.minNoise){
             mBuilder.setContentTitle("Noise Too Low")
@@ -114,7 +114,7 @@ public class NotificationValueEventListener implements ValueEventListener {
     private NotificationCompat.Builder getLightNotification(double currentLight){
         ServiceData serviceData=ServiceData.getInstance();
         NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(this.context, "channel_id")
-                .setSmallIcon(R.drawable.notification_icon)
+                .setSmallIcon(R.drawable.light)
                 .setPriority(NotificationCompat.PRIORITY_DEFAULT);
         if (currentLight<serviceData.minLight){
             mBuilder.setContentTitle("Light Too Low")
@@ -133,7 +133,7 @@ public class NotificationValueEventListener implements ValueEventListener {
     private NotificationCompat.Builder getCO2Notification(double currentCO2){
         ServiceData serviceData=ServiceData.getInstance();
         NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(this.context, "channel_id")
-                .setSmallIcon(R.drawable.notification_icon)
+                .setSmallIcon(R.drawable.air_quality)
                 .setPriority(NotificationCompat.PRIORITY_DEFAULT);
         if (currentCO2<serviceData.minCO2){
             mBuilder.setContentTitle("CO2 Too Low")
