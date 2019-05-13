@@ -25,7 +25,7 @@ float sumHumidity=0;
 int loopCounter=0;
 int sgpCounter=0;
 
-int loopIterations=60;
+int loopIterations=30;
 
 void setup() {
   delay(3000);
