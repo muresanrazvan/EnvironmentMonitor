@@ -34,8 +34,6 @@
         android:layout_marginTop="16dp"
         android:ems="10"
         android:gravity="center"
-        android:inputType="textPersonName"
-        android:textAllCaps="false"
         android:textSize="50sp"
         android:textStyle="bold|italic"
         android:visibility="invisible"
@@ -143,14 +141,25 @@
         android:id="@+id/noiseButtonId"
         android:layout_width="227dp"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="8dp"
-        android:layout_marginEnd="8dp"
-        android:layout_marginLeft="8dp"
-        android:layout_marginRight="8dp"
         android:layout_marginStart="8dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginBottom="8dp"
         android:enabled="false"
         android:text="Noise"
         app:layout_constraintBottom_toTopOf="@+id/airQualityButtonId"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
+
+    <Button
+        android:id="@+id/correlationButtonId"
+        android:layout_width="223dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginBottom="8dp"
+        android:text="Correlation"
+        android:enabled="false"
+        app:layout_constraintBottom_toTopOf="@+id/noiseButtonId"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
 

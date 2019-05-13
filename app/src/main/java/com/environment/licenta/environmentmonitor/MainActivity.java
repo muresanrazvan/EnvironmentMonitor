@@ -56,5 +56,8 @@ public class MainActivity extends Activity {
 
         Button noiseViewButton=findViewById(R.id.noiseButtonId);
         noiseViewButton.setOnClickListener(new StartActivityOnClickListener(this, NoiseActivity.class));
+
+        Button correlationViewButton=findViewById(R.id.correlationButtonId);
+        correlationViewButton.setOnClickListener(new StartActivityOnClickListener(this, CorrelationActivity.class));
     }
 }

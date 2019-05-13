@@ -57,6 +57,8 @@ public class EnvironmentValueEventListener implements ValueEventListener {
         humidityButton.setEnabled(true);
         Button editNotificationButton=activity.findViewById(R.id.settingsId);
         editNotificationButton.setEnabled(true);
+        Button correlationButton=activity.findViewById(R.id.correlationButtonId);
+        correlationButton.setEnabled(true);
 
         Date d = new Date();
         d.setTime(modelInstance.get(modelInstance.size()-1).getTimestamp());

@@ -30,6 +30,24 @@
                 android:value=".MainActivity" />
         </activity>
 
+        <activity android:name=".CorrelationActivity"
+            android:label="Correlation"
+            android:parentActivityName=".MainActivity">
+            <!-- The meta-data tag is required if you support API level 15 and lower -->
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".CorrelationActivity" />
+        </activity>
+
+        <activity android:name=".CorrelationResultsActivity"
+            android:label="Correlation Results"
+            android:parentActivityName=".CorrelationActivity">
+            <!-- The meta-data tag is required if you support API level 15 and lower -->
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".CorrelationResultsActivity" />
+        </activity>
+
         <activity android:name=".TemperatureActivity"
             android:label="Temperature"
             android:parentActivityName=".MainActivity">
