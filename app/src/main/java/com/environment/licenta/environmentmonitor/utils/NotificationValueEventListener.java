@@ -1,5 +1,8 @@
 package com.environment.licenta.environmentmonitor.utils;
 
+import android.app.Notification;
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
 import android.content.Context;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.app.NotificationManagerCompat;
@@ -16,6 +19,7 @@ import java.util.Collections;
 
 public class NotificationValueEventListener implements ValueEventListener {
     private Context context;
+    private String NOTIFICATION_CHANNEL_ID = "environment_notifications";
 
     public NotificationValueEventListener(Context context){
         this.context=context;
@@ -27,126 +31,157 @@ public class NotificationValueEventListener implements ValueEventListener {
         ServiceData serviceData=ServiceData.getInstance();
         EnvironmentData lastDatapoint = ServiceData.getInstance().environmentDataList.get(ServiceData.getInstance().environmentDataList.size()-1);
 
-        NotificationManagerCompat notificationManager = NotificationManagerCompat.from(this.context);
+        NotificationManager mNotificationManager =
+                (NotificationManager) this.context.getSystemService(Context.NOTIFICATION_SERVICE);
+
+        CharSequence name = "environment_notifications";// The user-visible name of the channel.
+        int importance = NotificationManager.IMPORTANCE_HIGH;
+        NotificationChannel mChannel = new NotificationChannel(NOTIFICATION_CHANNEL_ID, name, importance);
+        mNotificationManager.createNotificationChannel(mChannel);
 
         // Pre build the notifications
-        NotificationCompat.Builder temperatureNotification=getTemperatureNotification(Double.parseDouble(lastDatapoint.getTemperature()));
-        NotificationCompat.Builder humidityNotification=getHumidityNotification(Double.parseDouble(lastDatapoint.getHumidity()));
-        NotificationCompat.Builder lightNotification=getLightNotification(Double.parseDouble(lastDatapoint.getLight()));
-        NotificationCompat.Builder noiseNotification=getNoiseNotification(Double.parseDouble(lastDatapoint.getNoise()));
-        NotificationCompat.Builder eCO2Notification=getCO2Notification(Double.parseDouble(lastDatapoint.getECO2()));
+        Notification temperatureNotification=getTemperatureNotification(Double.parseDouble(lastDatapoint.getTemperature()));
+        Notification humidityNotification=getHumidityNotification(Double.parseDouble(lastDatapoint.getHumidity()));
+        Notification lightNotification=getLightNotification(Double.parseDouble(lastDatapoint.getLight()));
+        Notification noiseNotification=getNoiseNotification(Double.parseDouble(lastDatapoint.getNoise()));
+        Notification eCO2Notification=getCO2Notification(Double.parseDouble(lastDatapoint.getECO2()));
 
         if(serviceData.temperatureEnabled && temperatureNotification!=null){
-            notificationManager.notify(1, temperatureNotification.build());
+            mNotificationManager.notify(1, temperatureNotification);
         }
         if(serviceData.humidityEnabled && humidityNotification!=null){
-            notificationManager.notify(2, humidityNotification.build());
+            mNotificationManager.notify(2, humidityNotification);
         }
         if(serviceData.lightEnabled && lightNotification!=null){
-            notificationManager.notify(3, lightNotification.build());
+            mNotificationManager.notify(3, lightNotification);
         }
         if(serviceData.noiseEnabled && noiseNotification!=null){
-            notificationManager.notify(4, noiseNotification.build());
+            mNotificationManager.notify(4, noiseNotification);
         }
         if(serviceData.eCO2Enabled && eCO2Notification!=null){
-            notificationManager.notify(5, eCO2Notification.build());
+            mNotificationManager.notify(5, eCO2Notification);
         }
 
     }
 
-    private NotificationCompat.Builder getTemperatureNotification(double currentTemperature){
+    private Notification getTemperatureNotification(double currentTemperature){
         ServiceData serviceData=ServiceData.getInstance();
-        NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(this.context, "channel_id")
-                .setSmallIcon(R.drawable.noise)
-                .setPriority(NotificationCompat.PRIORITY_DEFAULT);
-        if (currentTemperature<serviceData.minTemperature){
-            mBuilder.setContentTitle("Temperature too low")
-                    .setContentText("Current temperature: "+currentTemperature+"C");
-            return mBuilder;
+        String title = "";
+        String content = "Current temperature: " + currentTemperature + "C";
+        if (currentTemperature<serviceData.minTemperature) {
+            title = "Temperature too low";
         }
-        if (currentTemperature>serviceData.maxTemperature){
-            mBuilder.setContentTitle("Temperature too high")
-                    .setContentText("Current temperature: "+currentTemperature+"C");
-            return mBuilder;
+        else if (currentTemperature>serviceData.maxTemperature){
+            title = "Temperature too high";
+        }
+        else{
+            return null;
         }
 
-        return null;
-    }
-
-    private NotificationCompat.Builder getHumidityNotification(double currentHumidity){
-        ServiceData serviceData=ServiceData.getInstance();
-        NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(this.context, "channel_id")
+        Notification notification = new Notification.Builder(this.context)
+                .setContentTitle(title)
+                .setContentText(content)
                 .setSmallIcon(R.drawable.humidity)
-                .setPriority(NotificationCompat.PRIORITY_DEFAULT);
-        if (currentHumidity<serviceData.minHumidity){
-            mBuilder.setContentTitle("Humidity Too Low")
-                    .setContentText("Current Humidity: "+currentHumidity+"%");
-            return mBuilder;
-        }
-        if (currentHumidity>serviceData.maxHumidity){
-            mBuilder.setContentTitle("Humidity Too High")
-                    .setContentText("Current Humidity: "+currentHumidity+"%");
-            return mBuilder;
-        }
+                .setChannelId(NOTIFICATION_CHANNEL_ID)
+                .build();
 
-        return null;
+        return notification;
     }
 
-    private NotificationCompat.Builder getNoiseNotification(double currentNoise){
+    private Notification getHumidityNotification(double currentHumidity){
         ServiceData serviceData=ServiceData.getInstance();
-        NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(this.context, "channel_id")
-                .setSmallIcon(R.drawable.noise)
-                .setPriority(NotificationCompat.PRIORITY_DEFAULT);
-        if (currentNoise<serviceData.minNoise){
-            mBuilder.setContentTitle("Noise Too Low")
-                    .setContentText("Current Noise: "+currentNoise+"dB");
-            return mBuilder;
+        String title = "";
+        String content = "Current humidity: " + currentHumidity + "%";
+        if (currentHumidity<serviceData.minHumidity) {
+            title = "Humidity too low";
         }
-        if (currentNoise>serviceData.maxNoise){
-            mBuilder.setContentTitle("Noise Too High")
-                    .setContentText("Current Noise: "+currentNoise+"dB");
-            return mBuilder;
+        else if (currentHumidity>serviceData.maxHumidity){
+            title = "Humidity too high";
+        }
+        else{
+            return null;
         }
 
-        return null;
+        Notification notification = new Notification.Builder(this.context)
+                .setContentTitle(title)
+                .setContentText(content)
+                .setSmallIcon(R.drawable.humidity)
+                .setChannelId(NOTIFICATION_CHANNEL_ID)
+                .build();
+
+        return notification;
     }
 
-    private NotificationCompat.Builder getLightNotification(double currentLight){
+    private Notification getNoiseNotification(double currentNoise){
         ServiceData serviceData=ServiceData.getInstance();
-        NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(this.context, "channel_id")
-                .setSmallIcon(R.drawable.light)
-                .setPriority(NotificationCompat.PRIORITY_DEFAULT);
-        if (currentLight<serviceData.minLight){
-            mBuilder.setContentTitle("Light Too Low")
-                    .setContentText("Current Light: "+currentLight+"Lux");
-            return mBuilder;
+        String title = "";
+        String content = "Current noise level: " + currentNoise + "dB";
+        if (currentNoise<serviceData.minNoise) {
+            title = "Noise level too low";
         }
-        if (currentLight>serviceData.maxLight){
-            mBuilder.setContentTitle("Light Too High")
-                    .setContentText("Current Light: "+currentLight+"Lux");
-            return mBuilder;
+        else if (currentNoise>serviceData.maxNoise){
+            title = "Noise level too high";
+        }
+        else{
+            return null;
         }
 
-        return null;
+        Notification notification = new Notification.Builder(this.context)
+                .setContentTitle(title)
+                .setContentText(content)
+                .setSmallIcon(R.drawable.humidity)
+                .setChannelId(NOTIFICATION_CHANNEL_ID)
+                .build();
+
+        return notification;
     }
 
-    private NotificationCompat.Builder getCO2Notification(double currentCO2){
+    private Notification getLightNotification(double currentLight){
         ServiceData serviceData=ServiceData.getInstance();
-        NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(this.context, "channel_id")
-                .setSmallIcon(R.drawable.air_quality)
-                .setPriority(NotificationCompat.PRIORITY_DEFAULT);
-        if (currentCO2<serviceData.minCO2){
-            mBuilder.setContentTitle("CO2 Too Low")
-                    .setContentText("Current eCO2: "+currentCO2+"ppm");
-            return mBuilder;
+        String title = "";
+        String content = "Current light intensity: " + currentLight + "Lux";
+        if (currentLight<serviceData.minLight) {
+            title = "Light intensity too low";
         }
-        if (currentCO2>serviceData.maxCO2){
-            mBuilder.setContentTitle("CO2 Too High")
-                    .setContentText("Current eCO2: "+currentCO2+"ppm");
-            return mBuilder;
+        else if (currentLight>serviceData.maxLight){
+            title = "Light intensity too high";
+        }
+        else{
+            return null;
         }
 
-        return null;
+        Notification notification = new Notification.Builder(this.context)
+                .setContentTitle(title)
+                .setContentText(content)
+                .setSmallIcon(R.drawable.humidity)
+                .setChannelId(NOTIFICATION_CHANNEL_ID)
+                .build();
+
+        return notification;
+    }
+
+    private Notification getCO2Notification(double currentCO2){
+        ServiceData serviceData=ServiceData.getInstance();
+        String title = "";
+        String content = "Current CO2 concentration: " + currentCO2 + "ppm";
+        if (currentCO2<serviceData.minCO2) {
+            title = "CO2 concentration too low";
+        }
+        else if (currentCO2>serviceData.maxCO2){
+            title = "CO2 concentration too high";
+        }
+        else{
+            return null;
+        }
+
+        Notification notification = new Notification.Builder(this.context)
+                .setContentTitle(title)
+                .setContentText(content)
+                .setSmallIcon(R.drawable.humidity)
+                .setChannelId(NOTIFICATION_CHANNEL_ID)
+                .build();
+
+        return notification;
     }
 
     private void putFirebaseData(DataSnapshot dataSnapshot){

@@ -7,8 +7,10 @@ import android.graphics.Paint;
 import android.os.Bundle;
 import android.widget.TextView;
 
+import com.environment.licenta.environmentmonitor.model.Constants;
 import com.environment.licenta.environmentmonitor.model.ProgramData;
 import com.environment.licenta.environmentmonitor.utils.HourAsXAxisLabelFormatter;
+import com.environment.licenta.environmentmonitor.utils.LineEquation;
 import com.environment.licenta.environmentmonitor.wrappers.EnvironmentData;
 import com.jjoe64.graphview.GraphView;
 import com.jjoe64.graphview.LabelFormatter;
@@ -21,7 +23,7 @@ import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Date;
 
-public class AirQualityActivity extends Activity {
+public class AirQualityActivity extends Activity implements Constants {
 
     private String lowestTVOC;
     private String highestTVOC;
@@ -72,13 +74,13 @@ public class AirQualityActivity extends Activity {
 
     public DataPoint[] getECO2Datapoints(){
         ArrayList<EnvironmentData> env_data=ProgramData.getInstance().environmentDataList;
-        DataPoint datapoints[]=new DataPoint[env_data.size()];
-        int index=0;
-
-        for(EnvironmentData data:env_data) {
+        DataPoint datapoints[]=new DataPoint[LAST_DATA_WINDOW_SIZE];
+        int startIndex=env_data.size()-LAST_DATA_WINDOW_SIZE;
+        startIndex = startIndex>0?startIndex:0;
+        for(int i =0;i<LAST_DATA_WINDOW_SIZE;i++) {
             Date date = new Date();
-            date.setTime(data.getTimestamp());
-            datapoints[index++] = new DataPoint(date, Double.parseDouble(data.getECO2()));
+            date.setTime(env_data.get(i+startIndex).getTimestamp());
+            datapoints[i] = new DataPoint(date, Double.parseDouble(env_data.get(i+startIndex).getECO2()));
         }
 
         return datapoints;
@@ -86,16 +88,33 @@ public class AirQualityActivity extends Activity {
 
     public DataPoint[] getTVOCDatapoints(){
         ArrayList<EnvironmentData> env_data=ProgramData.getInstance().environmentDataList;
-        DataPoint datapoints[]=new DataPoint[env_data.size()];
-        int index=0;
-
-        for(EnvironmentData data:env_data) {
+        DataPoint datapoints[]=new DataPoint[LAST_DATA_WINDOW_SIZE];
+        int startIndex=env_data.size()-LAST_DATA_WINDOW_SIZE;
+        startIndex = startIndex>0?startIndex:0;
+        for(int i =0;i<LAST_DATA_WINDOW_SIZE;i++) {
             Date date = new Date();
-            date.setTime(data.getTimestamp());
-            datapoints[index++] = new DataPoint(date, Double.parseDouble(data.getTVOC()));
+            date.setTime(env_data.get(i+startIndex).getTimestamp());
+            datapoints[i] = new DataPoint(date, Double.parseDouble(env_data.get(i+startIndex).getTVOC()));
         }
 
         return datapoints;
+    }
+
+    public LineEquation getBestFitLineEquation(DataPoint[] datapoints){
+        double ys[]=new double[LAST_POINTS_ANALYZED];
+        double xs[]=new double[LAST_POINTS_ANALYZED];
+        for (int i = 0; i<LAST_POINTS_ANALYZED; i++){
+            ys[i]=datapoints[i+datapoints.length-LAST_POINTS_ANALYZED].getY();
+            xs[i]=i;
+        }
+        return new LineEquation(xs,ys);
+    }
+
+    public DataPoint[] getPredictedLineDataPoints(LineEquation le, DataPoint[] dataPoints){
+        DataPoint p0=new DataPoint(dataPoints[dataPoints.length-LAST_POINTS_ANALYZED].getX(),le.getY(0));
+        DataPoint p1=new DataPoint(dataPoints[dataPoints.length-1].getX()+PREDICTED_POINTS*INTERVAL_MILLISECONDS,le.getY(PREDICTED_POINTS+LAST_POINTS_ANALYZED));
+        DataPoint ps[]={p0,p1};
+        return ps;
     }
 
     @Override
@@ -111,24 +130,37 @@ public class AirQualityActivity extends Activity {
         TextView highestECO2 = findViewById(R.id.highestECO2id);
         TextView lowestECO2 = findViewById(R.id.lowestECO2id);
         TextView averageECO2 = findViewById(R.id.averageECO2id);
+        TextView eCO2Status = findViewById(R.id.eCO2StatusId);
 
         DataPoint eCO2Datapoints[] = getECO2Datapoints();
         LineGraphSeries<DataPoint> eco2Series = new LineGraphSeries<>(eCO2Datapoints);
+
+        LineEquation eCO2BestFitLine = getBestFitLineEquation(eCO2Datapoints);
+        LineGraphSeries<DataPoint> eCO2BestFitSeries = new LineGraphSeries<>(getPredictedLineDataPoints(eCO2BestFitLine,eCO2Datapoints));
+        Paint paint = new Paint();
+        paint.setStyle(Paint.Style.STROKE);
+        paint.setStrokeWidth(5);
+        paint.setPathEffect(new DashPathEffect(new float[]{8, 6}, 0));
+        eCO2BestFitSeries.setColor(Color.BLUE);
+        eCO2BestFitSeries.setDrawAsPath(true);
+        eCO2BestFitSeries.setCustomPaint(paint);
 
         eco2Series.setColor(Color.GREEN);
         eco2Series.setThickness(3);
 
         eco2Graph.addSeries(eco2Series);
+        eco2Graph.addSeries(eCO2BestFitSeries);
         eco2Graph.getGridLabelRenderer().setLabelFormatter(new HourAsXAxisLabelFormatter());
         eco2Graph.getViewport().setXAxisBoundsManual(true);
         eco2Graph.getViewport().setMinX(eCO2Datapoints[0].getX());
-        eco2Graph.getViewport().setMaxX(eCO2Datapoints[eCO2Datapoints.length-1].getX());
+        eco2Graph.getViewport().setMaxX(eCO2Datapoints[eCO2Datapoints.length-1].getX()+PREDICTED_POINTS*INTERVAL_MILLISECONDS);
         eco2Graph.getGridLabelRenderer().setHumanRounding(false);
 
         currentECO2.setText(data.get(data.size()-1).getECO2() + "ppm");
         highestECO2.setText("Highest ECO2 Value: "+this.highestECO2+"ppm");
         lowestECO2.setText("Lowest ECO2 Value: "+this.lowestECO2+"ppm");
         averageECO2.setText("Average ECO2 Value: "+this.averageECO2+"ppm");
+        eCO2Status.setText("eCO2 is " + (eCO2BestFitLine.getM()>0?"increasing":"decreasing"));
 
         // tvoc info
         GraphView tvocGraph = findViewById(R.id.graph_tvoc);
@@ -136,23 +168,32 @@ public class AirQualityActivity extends Activity {
         TextView highestTVOC = findViewById(R.id.highestTVOCid);
         TextView lowestTVOC = findViewById(R.id.lowestTVOCid);
         TextView averageTVOC = findViewById(R.id.averageTVOCid);
+        TextView tvocStatus = findViewById(R.id.tvocStatusId);
 
         DataPoint tvocDatapoints[] = getTVOCDatapoints();
         LineGraphSeries<DataPoint> tvocSeries = new LineGraphSeries<>(tvocDatapoints);
+
+        LineEquation tvocBestFitLine = getBestFitLineEquation(tvocDatapoints);
+        LineGraphSeries<DataPoint> tvocBestFitSeries = new LineGraphSeries<>(getPredictedLineDataPoints(tvocBestFitLine,tvocDatapoints));
+        tvocBestFitSeries.setColor(Color.BLUE);
+        tvocBestFitSeries.setDrawAsPath(true);
+        tvocBestFitSeries.setCustomPaint(paint);
 
         tvocSeries.setColor(Color.MAGENTA);
         tvocSeries.setThickness(3);
 
         tvocGraph.addSeries(tvocSeries);
+        tvocGraph.addSeries(tvocBestFitSeries);
         tvocGraph.getGridLabelRenderer().setLabelFormatter(new HourAsXAxisLabelFormatter());
         tvocGraph.getViewport().setXAxisBoundsManual(true);
         tvocGraph.getViewport().setMinX(tvocDatapoints[0].getX());
-        tvocGraph.getViewport().setMaxX(tvocDatapoints[tvocDatapoints.length-1].getX());
+        tvocGraph.getViewport().setMaxX(tvocDatapoints[tvocDatapoints.length-1].getX()+PREDICTED_POINTS*INTERVAL_MILLISECONDS);
         tvocGraph.getGridLabelRenderer().setHumanRounding(false);
 
         currentTVOC.setText(data.get(data.size()-1).getTVOC() + "ppb");
         highestTVOC.setText("Highest TVOC Value: "+this.highestTVOC+"ppb");
         lowestTVOC.setText("Lowest TVOC Value: "+this.lowestTVOC+"ppb");
         averageTVOC.setText("Average TVOC Value: "+this.averageTVOC+"ppb");
+        tvocStatus.setText("TVOC is " + (tvocBestFitLine.getM()>0?"increasing":"decreasing"));
     }
 }
