@@ -11,15 +11,11 @@ import com.environment.licenta.environmentmonitor.model.Constants;
 import com.environment.licenta.environmentmonitor.model.ProgramData;
 import com.environment.licenta.environmentmonitor.utils.HourAsXAxisLabelFormatter;
 import com.environment.licenta.environmentmonitor.utils.LineEquation;
+import com.environment.licenta.environmentmonitor.utils.Utilities;
 import com.environment.licenta.environmentmonitor.wrappers.EnvironmentData;
 import com.jjoe64.graphview.GraphView;
-import com.jjoe64.graphview.LabelFormatter;
-import com.jjoe64.graphview.Viewport;
-import com.jjoe64.graphview.helper.DateAsXAxisLabelFormatter;
 import com.jjoe64.graphview.series.DataPoint;
 import com.jjoe64.graphview.series.LineGraphSeries;
-
-import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Date;
 
@@ -86,28 +82,33 @@ public class AirQualityActivity extends Activity implements Constants {
         return datapoints;
     }
 
+//    public DataPoint[] getTVOCDatapoints(){
+//        ArrayList<EnvironmentData> env_data=ProgramData.getInstance().environmentDataList;
+//        DataPoint datapoints[]=new DataPoint[LAST_DATA_WINDOW_SIZE];
+//        int startIndex=env_data.size()-LAST_DATA_WINDOW_SIZE;
+//        startIndex = startIndex>0?startIndex:0;
+//        for(int i =0;i<LAST_DATA_WINDOW_SIZE;i++) {
+//            Date date = new Date();
+//            date.setTime(env_data.get(i+startIndex).getTimestamp());
+//            datapoints[i] = new DataPoint(date, Double.parseDouble(env_data.get(i+startIndex).getTVOC()));
+//        }
+//
+//        return datapoints;
+//    }
+
+
     public DataPoint[] getTVOCDatapoints(){
         ArrayList<EnvironmentData> env_data=ProgramData.getInstance().environmentDataList;
-        DataPoint datapoints[]=new DataPoint[LAST_DATA_WINDOW_SIZE];
-        int startIndex=env_data.size()-LAST_DATA_WINDOW_SIZE;
+        DataPoint datapoints[]=new DataPoint[19];
+        int startIndex=120;
         startIndex = startIndex>0?startIndex:0;
-        for(int i =0;i<LAST_DATA_WINDOW_SIZE;i++) {
+        for(int i =0;i<19;i++) {
             Date date = new Date();
             date.setTime(env_data.get(i+startIndex).getTimestamp());
             datapoints[i] = new DataPoint(date, Double.parseDouble(env_data.get(i+startIndex).getTVOC()));
         }
 
         return datapoints;
-    }
-
-    public LineEquation getBestFitLineEquation(DataPoint[] datapoints){
-        double ys[]=new double[LAST_POINTS_ANALYZED];
-        double xs[]=new double[LAST_POINTS_ANALYZED];
-        for (int i = 0; i<LAST_POINTS_ANALYZED; i++){
-            ys[i]=datapoints[i+datapoints.length-LAST_POINTS_ANALYZED].getY();
-            xs[i]=i;
-        }
-        return new LineEquation(xs,ys);
     }
 
     public DataPoint[] getPredictedLineDataPoints(LineEquation le, DataPoint[] dataPoints){
@@ -135,7 +136,7 @@ public class AirQualityActivity extends Activity implements Constants {
         DataPoint eCO2Datapoints[] = getECO2Datapoints();
         LineGraphSeries<DataPoint> eco2Series = new LineGraphSeries<>(eCO2Datapoints);
 
-        LineEquation eCO2BestFitLine = getBestFitLineEquation(eCO2Datapoints);
+        LineEquation eCO2BestFitLine = Utilities.getBestFitLineEquation(eCO2Datapoints,LAST_POINTS_ANALYZED);
         LineGraphSeries<DataPoint> eCO2BestFitSeries = new LineGraphSeries<>(getPredictedLineDataPoints(eCO2BestFitLine,eCO2Datapoints));
         Paint paint = new Paint();
         paint.setStyle(Paint.Style.STROKE);
@@ -173,7 +174,7 @@ public class AirQualityActivity extends Activity implements Constants {
         DataPoint tvocDatapoints[] = getTVOCDatapoints();
         LineGraphSeries<DataPoint> tvocSeries = new LineGraphSeries<>(tvocDatapoints);
 
-        LineEquation tvocBestFitLine = getBestFitLineEquation(tvocDatapoints);
+        LineEquation tvocBestFitLine = Utilities.getBestFitLineEquation(tvocDatapoints,LAST_POINTS_ANALYZED);
         LineGraphSeries<DataPoint> tvocBestFitSeries = new LineGraphSeries<>(getPredictedLineDataPoints(tvocBestFitLine,tvocDatapoints));
         tvocBestFitSeries.setColor(Color.BLUE);
         tvocBestFitSeries.setDrawAsPath(true);

@@ -12,9 +12,6 @@ import android.widget.Switch;
 import android.widget.TextView;
 
 import com.environment.licenta.environmentmonitor.utils.NotificationService;
-import com.jjoe64.graphview.GraphView;
-import com.jjoe64.graphview.series.DataPoint;
-import com.jjoe64.graphview.series.LineGraphSeries;
 
 public class EditNotificationsActivity extends Activity {
     private SharedPreferences prefs;

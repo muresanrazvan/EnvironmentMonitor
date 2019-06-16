@@ -7,13 +7,10 @@ import java.util.ArrayList;
 
 public class ProgramData {
     public ArrayList<EnvironmentData> environmentDataList;
-
     private static ProgramData instance;
-
     private ProgramData(){
         environmentDataList=new ArrayList<>();
     }
-
     public static ProgramData getInstance() {
         if (instance == null) {
             instance = new ProgramData();

@@ -2,18 +2,15 @@
 #include<Wire.h>
 #include<Adafruit_SGP30.h>
 
+// Air quality sensor, using I2C Bus
 Adafruit_SGP30 sgp;
-
-// MAX44009 I2C address is 0x4A(74)
+// MAX44009 light sensor, I2C bus address is 0x4A(74)
 #define Addr 0x4A 
-
-// for DHT22, 
-//      VCC: 5V or 3V
-//      GND: GND
-//      DATA: 2
+// DHT22, VCC: 5V, GND: GND, DATA: 4
 int pinDHT22 = 4;
+// Sound sensor, VCC: 3.3V, GND: GND, DATA: A3
 int pinSound = A3;
-
+// Humidity Sensor
 SimpleDHT22 dht22;
 
 float sumSound=0;
@@ -35,15 +32,15 @@ void setup() {
   }
   // Set the analog sound detector pin to input
   pinMode(pinSound,INPUT);
-    // Initialise I2C communication as MASTER
+    // Initialize I2C communication as MASTER
   Wire.begin();
-  // Initialise serial communication, set baud rate = 9600
+  // Initialize serial communication, set baud rate = 115200
   Serial.begin(115200);
   // Start I2C Transmission
   Wire.beginTransmission(Addr);
   // Select configuration register
   Wire.write(0x02);
-  // Continuous mode, Integration time = 800 ms
+  // Manual mode, Integration time = 800 ms
   Wire.write(0x40);
   // Stop I2C transmission
   Wire.endTransmission();
@@ -52,25 +49,19 @@ void setup() {
 
 float getLight(){
   unsigned int data[2];
-
   // Start I2C Transmission
   Wire.beginTransmission(Addr);
   // Select data register
   Wire.write(0x03);
   // Stop I2C transmission
   Wire.endTransmission();
-
   // Request 2 bytes of data
   Wire.requestFrom(Addr, 2);
-
   // Read 2 bytes of data
-  // luminance msb, luminance lsb
-  if (Wire.available() == 2)
-  {
-    data[0] = Wire.read();
-    data[1] = Wire.read();
+  if (Wire.available() == 2){
+    data[0] = Wire.read(); // luminance high byte register
+    data[1] = Wire.read(); // luminance low byte register
   }
-
   // Convert the data to lux
   int exponent = (data[0] & 0xF0) >> 4;
   int mantissa = ((data[0] & 0x0F) << 4) | (data[1] & 0x0F);
@@ -90,18 +81,15 @@ double getSoundLevel()
   int value=0;
   value = analogRead(pinSound);
 
-  if (value < 10)
-  {
+  if (value < 10){
     decibelsValueQuiet += 30 * log10(value/dBAnalogQuiet);
     return decibelsValueQuiet;
-    }
-  else if ((value > 10) && ( value <= 19) )
-  {
+  }
+  else if ((value > 10) && ( value <= 19) ){
     decibelsValueMedium += 20*log10(value/dBAnalogMedium);
     return decibelsValueMedium;
   }
-  else if(value > 19)
-  {
+  else if(value > 19){
     decibelsValueLoud += 14*log10(value/dBAnalogLoud);
     return decibelsValueLoud;
   }
@@ -110,7 +98,8 @@ double getSoundLevel()
 
 uint32_t getAbsoluteHumidity(float temperature, float humidity) {
     // approximation formula from Sensirion SGP30 Driver Integration chapter 3.15
-    const float absoluteHumidity = 216.7f * ((humidity / 100.0f) * 6.112f * exp((17.62f * temperature) / (243.12f + temperature)) / (273.15f + temperature)); // [g/m^3]
+    const float absoluteHumidity = 216.7f * ((humidity / 100.0f) * 6.112f *exp((17.62f * temperature) / (243.12f + temperature)) / 
+    (273.15f + temperature)); // [g/m^3]
     const uint32_t absoluteHumidityScaled = static_cast<uint32_t>(1000.0f * absoluteHumidity); // [mg/m^3]
     return absoluteHumidityScaled;
 }
@@ -132,11 +121,7 @@ void loop() {
       Serial.println("Failed to get baseline readings");
       return;
     }
-//    Serial.print("****Baseline values: eCO2: 0x"); Serial.print(eCO2_base, HEX);
-//    Serial.print(" & TVOC: 0x"); Serial.println(TVOC_base, HEX);
   }
-
-
   float temperature = 0;
   float humidity = 0;
   int err = SimpleDHTErrSuccess;
@@ -144,7 +129,6 @@ void loop() {
     Serial.print("Read DHT22 failed, err="); Serial.println(err);delay(2000);
     return;
   }
-  
   sumSound+=getSoundLevel();
   sumLight+=getLight();
   sumTemperature+=(float)temperature;

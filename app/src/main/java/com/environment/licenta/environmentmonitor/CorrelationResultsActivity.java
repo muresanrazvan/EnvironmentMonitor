@@ -8,6 +8,7 @@ import android.widget.TextView;
 import com.environment.licenta.environmentmonitor.model.ProgramData;
 import com.environment.licenta.environmentmonitor.utils.Correlation;
 import com.environment.licenta.environmentmonitor.utils.LineEquation;
+import com.environment.licenta.environmentmonitor.utils.Utilities;
 import com.environment.licenta.environmentmonitor.wrappers.EnvironmentData;
 import com.jjoe64.graphview.GraphView;
 import com.jjoe64.graphview.series.DataPoint;
@@ -22,14 +23,6 @@ import java.util.Arrays;
 import java.util.Comparator;
 
 public class CorrelationResultsActivity extends Activity {
-    private void sortDatapointsAscendingByX(DataPoint datapoints[]){
-        Arrays.sort(datapoints, new Comparator<DataPoint>(){
-            @Override
-            public int compare(DataPoint o1, DataPoint o2) {
-                return o1.getX()<o2.getX()?-1:(o1.getX()>o2.getX()?1:0);
-            }
-        });
-    }
 
     private double getMaxY(DataPoint[] datapoints){
         double largest=-999999;
@@ -66,7 +59,7 @@ public class CorrelationResultsActivity extends Activity {
 //        for(EnvironmentData data:env_data) {
 //            datapoints[index++] = new DataPoint(getDataByLabel(data,xAxis), getDataByLabel(data,yAxis));
 //        }
-//        sortDatapointsAscendingByX(datapoints);
+//        Utilities.sortDatapointsAscendingByX(datapoints);
 //        return datapoints;
 //    }
 
@@ -76,9 +69,12 @@ public class CorrelationResultsActivity extends Activity {
         int index=0;
 
         for (int i = 126; i<136;i++) {
-            datapoints[index++] = new DataPoint(getDataByLabel(env_data.get(i),xAxis), getDataByLabel(env_data.get(i),yAxis));
+            datapoints[index++] = new DataPoint(getDataByLabel(env_data.get(i), xAxis), getDataByLabel(env_data.get(i), yAxis));
         }
-        sortDatapointsAscendingByX(datapoints);
+        for (int i = 0; i<10;i++){
+            System.out.println("x:"+datapoints[i].getX()+"; y:"+datapoints[i].getY());
+        }
+        Utilities.sortDatapointsAscendingByX(datapoints);
         return datapoints;
     }
 

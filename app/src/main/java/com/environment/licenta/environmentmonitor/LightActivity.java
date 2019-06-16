@@ -11,6 +11,7 @@ import com.environment.licenta.environmentmonitor.model.Constants;
 import com.environment.licenta.environmentmonitor.model.ProgramData;
 import com.environment.licenta.environmentmonitor.utils.HourAsXAxisLabelFormatter;
 import com.environment.licenta.environmentmonitor.utils.LineEquation;
+import com.environment.licenta.environmentmonitor.utils.Utilities;
 import com.environment.licenta.environmentmonitor.wrappers.EnvironmentData;
 import com.jjoe64.graphview.GraphView;
 import com.jjoe64.graphview.series.DataPoint;
@@ -64,16 +65,6 @@ public class LightActivity extends Activity implements Constants {
         this.highestLight= "" + highestLight;
     }
 
-    public LineEquation getBestFitLineEquation(DataPoint[] datapoints){
-        double ys[]=new double[LAST_POINTS_ANALYZED];
-        double xs[]=new double[LAST_POINTS_ANALYZED];
-        for (int i = 0; i<LAST_POINTS_ANALYZED; i++){
-            ys[i]=datapoints[i+datapoints.length-LAST_POINTS_ANALYZED].getY();
-            xs[i]=i;
-        }
-        return new LineEquation(xs,ys);
-    }
-
     public DataPoint[] getPredictedLineDataPoints(LineEquation le, DataPoint[] dataPoints){
         DataPoint p0=new DataPoint(dataPoints[dataPoints.length-LAST_POINTS_ANALYZED].getX(),le.getY(0));
         DataPoint p1=new DataPoint(dataPoints[dataPoints.length-1].getX()+PREDICTED_POINTS*INTERVAL_MILLISECONDS,le.getY(PREDICTED_POINTS+LAST_POINTS_ANALYZED));
@@ -98,7 +89,7 @@ public class LightActivity extends Activity implements Constants {
         DataPoint datapoints[] = getDatapoints();
         LineGraphSeries<DataPoint> series = new LineGraphSeries<>(datapoints);
 
-        LineEquation bestFitLine = getBestFitLineEquation(datapoints);
+        LineEquation bestFitLine = Utilities.getBestFitLineEquation(datapoints,LAST_POINTS_ANALYZED);
         LineGraphSeries<DataPoint> bestFitSeries = new LineGraphSeries<>(getPredictedLineDataPoints(bestFitLine,datapoints));
         Paint paint = new Paint();
         paint.setStyle(Paint.Style.STROKE);

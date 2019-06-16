@@ -29,10 +29,16 @@ def send_to_firebase(data,last_datetime):
         if len(waiting_data)>0:
             while(len(waiting_data)>0):
                 tmp_data=waiting_data.pop(0)
-                db.child("users").child(tmp_data["last_datetime"].replace(":","-").replace(" ","-").replace(".","-")).set(tmp_data["data"])
-                print("uploading waiting data"+str(tmp_data["data"]))
-                
-        db.child("users").child(last_datetime.replace(":","-").replace(" ","-").replace(".","-")).set(data)
+                db.child("params")
+				.child(tmp_data["last_datetime"]
+				.replace(":","-")
+				.replace(" ","-")
+				.replace(".","-"))
+				.set(tmp_data["data"])
+                print("uploading waiting data" + str(tmp_data["data"]))
+        db.child("params")
+		.child(last_datetime.replace(":","-").replace(" ","-").replace(".","-"))
+		.set(data)
     else:
         print("failed to upload")
         waiting_data.append({"data":data,"last_datetime":last_datetime})
@@ -45,7 +51,7 @@ while True:
   data={}
   print("----")
   last_datetime=str(datetime.datetime.now())
-  timestamp=int(round(time.time() * 1000))
+  timestamp=int(round(time.time() * 1000)) 
   if count==0:
       file=open("output.txt","a")
   while output != "":
